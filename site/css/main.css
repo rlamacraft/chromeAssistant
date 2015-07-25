@@ -1,0 +1,137 @@
+body {
+  background-color: #413E41;
+}
+
+* {
+  transition: all .5s ease;
+  font-family: "lato", helvetica, sans-serif;
+  color: #ccc;
+}
+
+.no-animation * {
+  transition: none;
+}
+
+.main-content {
+  left: 50%;
+  top: 30%;
+  margin-left: -250px;
+  margin-top: -20px;
+  position: absolute;
+  height: 200px;
+  width: 500px;
+}
+
+#cmd-primary, #cmd-secondary {
+  width: 500px;
+  max-width: 500px;
+  border-radius: 5px;
+  border: none;
+  background-color: #252325;
+  font-size: 1.5em;
+  position: absolute;
+  padding: 5px 8px;
+}
+
+#cmd-primary:focus,
+#cmd-secondary:focus,
+#submit-btn:focus {
+  outline: none;
+}
+
+#cmd-primary {
+    top: 0;
+    z-index: 150;
+    background-color: rgba(37, 35, 37, 0.5);
+    height: 39px;
+}
+
+#cmd-primary-background {
+  width: 500px;
+  height: 39px;
+  background-color: 252325;
+  position: absolute;
+  border-radius: 5px;
+  z-index: 75;
+}
+
+#cmd-secondary {
+  opacity: 0;
+  margin-top: 45px;
+  height: 0px;
+  max-height: 500px;
+  overflow: scroll;
+
+  position: relative;
+}
+
+#submit-btn {
+  position: absolute;
+  font-size: 1.8em;
+  padding: 5px 5px;
+  margin-left: 465px;
+  transition: all .1s ease;
+  z-index: 200;
+}
+
+#submit-btn:hover {
+  cursor: pointer;
+  color: #2E6967;
+}
+
+#loading {
+  position: absolute;
+  width: 0px;
+  height: 39px;
+  border-radius: 5px;
+  background-color: #2F999C;
+  transition-property: all, opacity;
+  transition-duration: 2s;
+  transition-timing-function: ease-out, cubic-bezier(0.23, 1.04, 0, 0.91);
+  z-index: 100;
+}
+
+#toast {
+  width: 300px;
+  margin-top: 100px;
+  margin-left: 100px;
+  border-radius: 5px;
+  padding: 5px 8px;
+  background-color: #252325;
+  font-size: 1.5em;
+  opacity: 0;
+  text-align: center;
+  display: none;
+}
+
+h1 {
+  width: 100%;
+  text-align: center;
+}
+
+/******
+** Help Page
+******/
+
+.back {
+  font-size: 3em;
+  padding-left: 10px;
+  position: absolute;
+}
+
+span.code {
+  font-family: "Source Code Pro", Courier, monospace;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  list-style-type: none;
+  padding-bottom: 3px;
+}
+
+li span {
+  padding-left: 10px;
+}

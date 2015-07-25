@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title Help - Chrome Assistant </title>
+
+    <link href="css/main.css" rel="stylesheet" type"text-css">
+
+    <link rel="stylesheet" href="css/font-awesome-4.3.0/css/font-awesome.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+  </head>
+
+  <body class="no-animation">
+    <a href="javascript:history.back()"><div class="back"> <i class="fa fa-angle-double-left"></i> </div></a>
+    <h1> Help </h1>
+
+    <p> This is a highly customizable minimalist launcher for Chrome, with a solely command-based UI.</p>
+
+    <h2> Command List </h2>
+
+    <ul>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> help </span>- This brings up this menu. </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> ? </span>- This will search DuckDuckGo </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> ! </span>- This will go to a bookmark (including, crucially, JS bookmarklets) </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> bookmark </span>- This will save a bookmark (and any JS code as a bookmrklet) </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> note </span>- Brings up a temporary space to write a note whilst working. WARNING: these aren't saved! </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> map </span>- Allows for single letter shortcuts e.g. "map r reddit" will jump to reddit when r is pressed </li>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> colour </span>- Changes the accent colour of the app i.e. the loading bar, accepts standard colours, HEX and RGB </li>
+    </ul>
+
+    <h2> JavaScript Coding </h2>
+
+    <p> Javascript scripts can be executed, just like bookmarklets would be, but we take care of all of the handling
+        Just type "js [filename]" where [filename] is the name of your desired script then type your script in the box
+        To just execute some code, type "js" and then the code in the box. This will not be saved.
+        To execute a saved script, type "!" and the name of the script.
+    </p>
+
+    <h3> Some helpful, built-in, functions </h3>
+
+    <ul>
+      <li> <i class="fa fa-angle-right"></i> <span class="code"> print(message, color [optional] ) </span>- Displays a custom message in the standard toast box. Can only be 1 'print' per script, like return in most lnaguages. </li>
+    </ul>
+
+    <script src="js/jquery-2.1.4.js"> </script>
+    <script src="js/main.js"> </script>
+  </body>
+</html>
