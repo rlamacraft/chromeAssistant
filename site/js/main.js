@@ -5,14 +5,24 @@ operand = "";
 save_state = "";
 redirecting = false;
 meta_colour = "";
-drawer_open = false;
+DEFAULT_COLOUR = "#2F999C";
+DEFAULT_SEARCH_ENGINE = "https://duckduckgo.com/?q=";
+plugins = {};
 
 function onLoad() {
-  $('#cmd-primary').focus()
-  if(localStorage["meta:colour"] == null) {
-    localStorage["meta:colour"] = "#2F999C";
+  $('#cmd-primary').focus().css("color", "#ccc");
+
+  //colours
+  var colour;
+  if((colour = localStorage["meta:colour"]) == null) {
+    colour = DEFAULT_COLOUR;
   }
-  change_accent_colour(localStorage["meta:colour"]);
+  change_accent_colour(colour);
+
+  //search engine
+  if(localStorage["searchEngine"] == null) {
+    localStorage["searchEngine"] = DEFAULT_SEARCH_ENGINE;
+  }
   $('#toast').css("display", "block");
 
   //just for detecting backspace
@@ -24,8 +34,7 @@ function onLoad() {
   });
 
   //primary command box input event
-  $('#cmd-primary').on("keypress", function(event)
-  {
+  $('#cmd-primary').on("keypress", function(event) {
     if(redirecting) {
       redirecting = false;
       update_loading(0);
@@ -36,14 +45,26 @@ function onLoad() {
     else if( 65 <= event.charCode <= 90)
     {
       char = String.fromCharCode(event.charCode);
-      if($('#cmd-primary').val().length == 0)
-      {
-        if((shortcutName = localStorage["shortcut:" + char]) != null)
-        {
-          redirect(localStorage[shortcutName]);
+      if($('#cmd-primary').val().length == 0) {
+        if((shortcutCommand = localStorage["shortcut:" + char]) != null) {
+          delayedAction(shortcutCommand);
         }
       }
     }
+
+    //remove dragging and dropping files on whole page
+    $(document).on('dragenter', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $(document).on('dragover', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+    $(document).on('drop', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    });
   } );
 
   //make secondary input box longer as necessary
@@ -56,23 +77,18 @@ function onLoad() {
   } );
 
   $('#submit-btn').click(function() {
-    if(drawer_open) {
-      submit();
-    } else {
+    if($("#cmd-secondary").val() == "") {
       action($("#cmd-primary").val());
+    } else {
+      submit();
     }
   });
 
-  $(".back").hover(function() {
-    $(".back i").css("color", meta_colour);
-  },
-  function() {
-    $(".back i").css("color", "#ccc");
-  });
+  loadPlugins();
 }
 
 function action(command) {
-  firstSpaceIndex = command.indexOf(' ');
+  var firstSpaceIndex = command.indexOf(' ');
   operation = command.substring(0, firstSpaceIndex);
   operand = command.substring(firstSpaceIndex+1, command.length );
   if(firstSpaceIndex < 0) {
@@ -81,14 +97,15 @@ function action(command) {
   }
   switch(operation) {
     case("!"):
-      window.location.href = localStorage[operand];
+      go_to_site(localStorage[operand]);
       reset();
       break;
     case("?"):
-      window.location.href = "https://duckduckgo.com/?q=" + operand;
+      searchEngine = localStorage["searchEngine"];
+      go_to_site(searchEngine + operand);
       break;
     case("help"):
-      window.location.href = "help.html";
+      go_to_site("help.html");
       break;
     case("bookmark"):
       open_cmd_sec();
@@ -113,17 +130,29 @@ function action(command) {
       save("meta:colour", operand, "updated accent colour");
       change_accent_colour(operand);
       break;
+    case("searchEngine"):
+      save( "searchEngine", operand, "Saved new search engine");
+      break;
+    case("plugin"):
+      save_plugin();
+      break;
+    default:
+      if(plugins[operation] != undefined) {
+        go_to_site(plugins[operation]);
+        reset();
+      }
+      break;
   }
 }
 
 function submit() {
-  key = operand;
-  value = $("#cmd-secondary").val();
+  var key = operand;
+  var value = $("#cmd-secondary").val();
   switch(save_state) {
-    case "bookmark":      value = "http://" + value;      message = "saved bookmark"; break;
-    case "js-save":       value = "javascript:" + value;  message = "saved script";   break;
-    case "js-execute":    window.location.href = "javascript:" + value; message = "executed"; break;
-    case "map":           key = "shortcut:" + key;        message = "saved shortcut"; break;
+    case "bookmark":      value = "http://" + value;                    message = "saved bookmark"; break;
+    case "js-save":       value = "javascript:" + value;                message = "saved script";   break;
+    case "js-execute":    go_to_site("javascript:" + value);            message = "executed";       break;
+    case "map":           key = "shortcut:" + key;                      message = "saved shortcut"; break;
   }
   if(save_state != "js-execute") {
     save(key, value, message);
@@ -132,32 +161,24 @@ function submit() {
   }
 }
 
-function open_cmd_sec() {
-  cmd_sec = $("#cmd-secondary");
-  cmd_sec.css('opacity','1');
-  cmd_sec.css('height', '300px');
-  cmd_sec.focus();
-  drawer_open = true;
+function open_cmd_sec( codeFont ) {
+  $("#cmd-secondary").focus();
 }
 
 function reset() {
-  console.log("RESET");
   $("#cmd-primary").val("");
-  cmd_sec = $("#cmd-secondary")
-  cmd_sec.val("");
-  cmd_sec.css('opacity', '0');
-  cmd_sec.css('height', '0px');
-  drawer_open = false;
+  $("#cmd-secondary").fadeOut(200, function() {
+    $("#cmd-secondary").val("").show();
+  })
 }
 
-function redirect(destination) {
+function delayedAction(command) {
   redirecting = true;
-  //width = parseInt($("#loading").css("width").substring(0, 3));
 
   update_loading(500);
   timeoutID = window.setTimeout(function() {
     if(redirecting && $("#cmd-primary").val().length == 1) {
-      window.location.href = destination;
+      action(command);
     } else {
       redirecting = false;
       update_loading(0);
@@ -175,31 +196,32 @@ function update_loading(width) {
 }
 
 function change_accent_colour(colour) {
+  if( colour == "DEFAULT_COLOUR")
+    colour = DEFAULT_COLOUR;
   meta_colour = colour;
   $('#loading').css("background-color", colour);
   $('#toast').css("color", colour);
 }
 
 function display_toast(message, colour) {
-  timeoutID = window.setTimeout(function() {
+  var timeoutID = window.setTimeout(function() {
     toast_appear(message, colour);
   }, 500);
   timeoutID = window.setTimeout(toast_disappear, 2000);
 }
 
 function toast_appear(message, colour) {
-  toast = $('#toast');
+  var toast = $('#toast');
   toast.text(message);
   toast.css("margin-top", "75px");
   toast.css("opacity", "1");
   if(arguments.length == 2) {
-    console.log(colour);
     toast.css("color", colour);
   }
 }
 
 function toast_disappear() {
-  toast = $('#toast');
+  var toast = $('#toast');
   toast.css("margin-top", "100px");
   toast.css("opacity", "0");
   toast.css("color", meta_colour);
@@ -207,9 +229,56 @@ function toast_disappear() {
 
 function save(key, value, message) {
   localStorage[key] = value;
-  $('#cmd-primary').focus();
+  $('#cmd-primary').focus().css("color", "#ccc");
   reset();
   display_toast(message);
+}
+
+function scrollTo(id) {
+  $('html, body').animate({
+    scrollTop: $("#" + id).offset().top
+  }, 2000);
+};
+
+function loadPlugins() {
+  for(var storedItem in localStorage) {
+    if(storedItem.substring(0, 7) == "plugin:") {
+      plugins[storedItem.substring(7, storedItem.length)] = localStorage[storedItem];
+    }
+  }
+}
+
+function save_plugin() {
+  open_cmd_sec();
+  var dropZone = document.getElementById("cmd-secondary");
+  dropZone.innerHTML = "Drop the plugin's JavaScript here.";
+
+  function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+  }
+
+  function handleFileSelect(evt) {
+    var files = evt.dataTransfer.files; // FileList object.
+    var f = files[0];
+
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      key = "plugin:" + operand;
+      value = "javascript:" + reader.result;
+      message = "Saved plugin.";
+      save(key, value, message);
+      plugins[operand] = value;
+      dropZone.innerHTML = "";
+    };
+
+    reader.readAsText(f);
+  };
+
+  dropZone.addEventListener('dragover', handleDragOver, false);
+  dropZone.addEventListener('drop', handleFileSelect, false);
 }
 
 /****
@@ -218,4 +287,12 @@ function save(key, value, message) {
 
 function print(output, colour) {
     display_toast(output, colour);
+}
+
+function get_primary_arg() {
+  return operand;
+}
+
+function go_to_site(URL) {
+  window.location.href = URL;
 }

@@ -11,6 +11,15 @@ A minimalist launcher for Chrome that is inspired by Google Now, Apple's Spotlig
 
 # Change Log
 
+V1.1
++ Source Code Pro used for code fields
++ Customise seach engine with 'searchEngine'
++ Maps are not shortcuts to commands, rather than bookmarks
++ Load javascript plugins, allowing custom commands - bundled plugins contains some examples
+  - To load a plugin type 'plugin <command name>' such as 'plugin images' for google images plugin, then drop the plugin .js file in the box
+  - Call the plugin with the command name, like every other command.
++ Redesigned UI, to be even more minimalist!!
+
 V1.0
 + Search DuckDuckGo with '?'
 + Save bookmarks ('bookmark') and JavaScript bookmarklets ('js')
