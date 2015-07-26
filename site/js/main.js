@@ -175,7 +175,7 @@ function reset() {
 function delayedAction(command) {
   redirecting = true;
 
-  update_loading(500);
+  update_loading(100);
   timeoutID = window.setTimeout(function() {
     if(redirecting && $("#cmd-primary").val().length == 1) {
       action(command);
@@ -187,7 +187,7 @@ function delayedAction(command) {
 }
 
 function update_loading(width) {
-  $("#loading").css("width", width + "px");
+  $("#loading").css("width", width + "%");
   if(width == 0){
     $("#loading").css("opacity", "0");
   } else {
